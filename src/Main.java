@@ -22,48 +22,62 @@
 //     return data
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class Main {
-
-    public static int[] bose_nelson(int[] data) {
-        int m = 1;
-        int j;
-        while (m < data.length) {
-            j = 0;
-            while (j + m < data.length) {
-                data = bose_nelson_merge(j, m, m, data);
-                j = j + m + m;
-                m = m + m;
-            }
+    public static int[] fill_arr(int length, int min, int max){
+        Random random = new Random();
+        int[] arr = new int[length];
+        int diff = Math.abs(max - min);
+        if (min > max){
+            min = max;
         }
-        return data;
+        for (int i = 0; i < arr.length; i++){
+            arr[i] = min + random.nextInt(diff + 1);
+        }
+        return arr;
     }
 
-    public static int[] bose_nelson_merge(int j, int r, int m, int[] data) {
-        int buf;
-        if (j + r < data.length) {
-            if (m == 1) {
-                if (data[j] > data[j + r]) {
-                    buf = data[j];
-                    data[j] = data[j + r];
-                    data[j + r] = buf;
-                } else {
-                    m /= 2;
-                    bose_nelson_merge(j, r, m, data);
-                    if (j + r + m < data.length) {
-                        bose_nelson_merge(j + m, r, m, data);
-                        bose_nelson_merge(j + m, r - m, m, data);
-                    }
-                }
+    public static void mergeSort(int[] src, int n) {
+        if (n < 2) return;
+
+        int mid = n / 2;
+        int[] left = new int[mid];
+        int[] right = new int[n - mid];
+
+        System.arraycopy(src, 0, left, 0, mid);
+        System.arraycopy(src, mid, right, 0, n - mid);
+
+        mergeSort(left, mid);
+        mergeSort(right, n - mid);
+
+        merge(src, left, right, mid, n - mid);
+    }
+    public static void merge(int[] src, int[] left, int[] right, int leftLength, int rightLength) {
+        int k = 0, i = 0, j = 0;
+
+        while (i < leftLength && j < rightLength) {
+            if (left[i] <= right[j]){
+                src[k++] = left[i++];
+            } else {
+                src[k++] = right[j++];
             }
         }
-        return data;
+
+        while (i < leftLength) {
+            src[k++] = left[i++];
+        }
+
+        while (j < rightLength) {
+            src[k++] = right[j++];
+        }
     }
 
 
     public static void main(String[] args) {
-        int[] arr = {9, 5, 2, 7, 0, 8, 6, 3, 1, 4};
-        int[] sorted_arr = bose_nelson(arr);
-        System.out.println(Arrays.toString(sorted_arr));
+        int[] arr = fill_arr(10, 0, 100);
+        System.out.println(Arrays.toString(arr));
+        mergeSort(arr, arr.length);
+        System.out.println(Arrays.toString(arr));
     }
 }
